@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bycript from 'bcryptjs';
 import { Model } from 'mongoose';
@@ -14,6 +15,7 @@ import { getProfile } from './helper/profile';
 export class AuthService {
   constructor(
     @InjectModel('users') private readonly authModel: Model<AuthModel>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createNewUser(createAuthDto: CreateAuthDto) {
