@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
 
@@ -14,5 +14,10 @@ export class AuthController {
   @Post('/login')
   login(@Body() loginAuthDto: LoginAuthDto) {
     return this.authService.loginUser(loginAuthDto);
+  }
+
+  @Get(':mail')
+  getByMail(@Param('mail') email) {
+    return this.authService.findUserByEmail(email);
   }
 }

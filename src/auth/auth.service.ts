@@ -35,7 +35,8 @@ export class AuthService {
     }
     const result = await newUser.save();
     const profile = getProfile(result);
-    return profile;
+    const accessToken = await this.jwtService.sign(profile);
+    return { profile, accessToken };
   }
 
   async loginUser(loginAuthDto: LoginAuthDto) {
@@ -52,9 +53,11 @@ export class AuthService {
       throw new BadRequestException('Password does not match!');
     }
     const profile = getProfile(user);
+    const accessToken = await this.jwtService.sign(profile);
     return {
       message: 'User Login Successfully!',
       profile,
+      accessToken,
     };
   }
 
