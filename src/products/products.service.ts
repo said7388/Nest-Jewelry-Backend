@@ -30,7 +30,7 @@ export class ProductsService {
   }
 
   async findOneById(id: string) {
-    const product = await this.productModel.findOne({ _id: id }).exec();
+    const product = this.findProductById(id);
     if (!product) {
       throw new NotFoundException('Product not found for this ID: ' + id);
     }
@@ -65,6 +65,12 @@ export class ProductsService {
     if (!result) {
       throw new HttpException('Product Not Found!', HttpStatus.NOT_FOUND);
     }
-    return { message: 'Product deleted successfully' };
+    console.log(result);
+    return { message: 'Product deleted successfully', deleted: true };
+  }
+
+  async findProductById(id: string) {
+    const product = await this.productModel.findOne({ _id: id }).exec();
+    return product;
   }
 }
