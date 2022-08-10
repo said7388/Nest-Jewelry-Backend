@@ -4,14 +4,12 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrdersService } from './orders.service';
 
 @Controller('orders')
@@ -26,22 +24,16 @@ export class OrdersController {
 
   @Get()
   findAll(@GetUser() user) {
-    console.log(user);
     return this.ordersService.findOrderByEmail(user.email);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.ordersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-    return this.ordersService.update(+id, updateOrderDto);
+  findOne(@Param('id') id: string, @GetUser() user) {
+    return this.ordersService.findOne(id, user.email);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.ordersService.remove(+id);
+  remove(@Param('id') id: string, @GetUser() user) {
+    return this.ordersService.remove(id, user.email);
   }
 }

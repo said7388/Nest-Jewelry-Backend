@@ -1,9 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ProductsService } from 'src/products/products.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderModel } from './entities/order.entity';
 
 @Injectable()
@@ -39,15 +42,21 @@ export class OrdersService {
     return orders;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
+  async findOne(id: string, email: string) {
+    const order = await this.orderModel.findById(id).exec();
+    if (!(email === order.email)) {
+      throw new UnauthorizedException('You have not access for this order!');
+    }
+    return order;
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  async remove(id: string, email: string) {
+    const result = await this.orderModel
+      .findOneAndRemove({ _id: id, email: email })
+      .exec();
+    if (!result) {
+      throw new UnauthorizedException('You have not access for this order!');
+    }
+    return { message: 'Order deleted successfully!' };
   }
 }
