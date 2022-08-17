@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
 
@@ -17,7 +28,18 @@ export class AuthController {
   }
 
   @Get(':mail')
+  @UseGuards(AuthGuard())
   getByMail(@Param('mail') email) {
     return this.authService.findUserByEmail(email);
+  }
+
+  @Patch('/admin')
+  @UseGuards(AuthGuard())
+  makeAdmin(@Req() req, @Body() body) {
+    const { user } = req;
+    if (user.role === 'admin') {
+      return this.authService.makeUserToAdmin(body.email);
+    }
+    throw new UnauthorizedException('You have no permission to make admin.');
   }
 }

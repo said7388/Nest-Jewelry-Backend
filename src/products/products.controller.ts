@@ -6,7 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductsService } from './products.service';
@@ -21,7 +25,14 @@ export class ProductsController {
   }
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
+  @UseGuards(AuthGuard())
+  create(@Body() createProductDto: CreateProductDto, @Req() req) {
+    const { user } = req;
+    if (user?.role !== 'admin') {
+      throw new UnauthorizedException(
+        'You have not access to create a new product!',
+      );
+    }
     return this.productsService.createNewProduct(createProductDto);
   }
 
@@ -31,12 +42,30 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+  @UseGuards(AuthGuard())
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @Req() req,
+  ) {
+    const { user } = req;
+    if (user?.role !== 'admin') {
+      throw new UnauthorizedException(
+        'You have not access for update this product!',
+      );
+    }
     return this.productsService.updateProduct(id, updateProductDto);
   }
 
   @Delete(':id')
-  deleteProduct(@Param('id') id: string) {
+  @UseGuards(AuthGuard())
+  deleteProduct(@Param('id') id: string, @Req() req) {
+    const { user } = req;
+    if (user?.role !== 'admin') {
+      throw new UnauthorizedException(
+        'You have not access for delete this product!',
+      );
+    }
     return this.productsService.deleteProduct(id);
   }
 }

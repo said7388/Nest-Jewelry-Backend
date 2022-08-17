@@ -4,6 +4,7 @@ export const getProfile = (data: any) => {
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
+    role: data.role,
   };
   return profile;
 };

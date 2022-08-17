@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
@@ -28,6 +29,7 @@ export class AuthService {
       email,
       password: hashPassword,
       salt,
+      role: 'user',
     });
     const existingUser = await this.findUserByEmail(email);
     if (existingUser.length > 0) {
@@ -58,6 +60,25 @@ export class AuthService {
       message: 'User Login Successfully!',
       profile,
       accessToken,
+    };
+  }
+
+  async makeUserToAdmin(email: string) {
+    const result = await this.authModel.updateOne(
+      { email: email },
+      { $set: { role: 'admin' } },
+    );
+
+    if (!result.matchedCount) {
+      throw new NotFoundException('User does not exist!');
+    } else if (!result.modifiedCount) {
+      return {
+        message: 'This user is already an admin!',
+      };
+    }
+
+    return {
+      message: 'Make this user as an admin successfully!',
     };
   }
 

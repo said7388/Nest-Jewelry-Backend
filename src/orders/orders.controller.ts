@@ -29,7 +29,7 @@ export class OrdersController {
 
   @Get(':id')
   findOne(@Param('id') id: string, @GetUser() user) {
-    return this.ordersService.findOne(id, user.email);
+    return this.ordersService.findOne(id, user?.email);
   }
 
   @Delete(':id')

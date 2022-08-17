@@ -44,7 +44,7 @@ export class OrdersService {
 
   async findOne(id: string, email: string) {
     const order = await this.orderModel.findById(id).exec();
-    if (!(email === order.email)) {
+    if (!(email === order?.email)) {
       throw new UnauthorizedException('You have not access for this order!');
     }
     return order;
