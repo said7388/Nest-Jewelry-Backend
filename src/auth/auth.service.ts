@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bycript from 'bcryptjs';
 import { Model } from 'mongoose';
+import { confirmEmailLink } from 'src/utils/confirmEmailLink';
+import { sendEmail } from 'src/utils/sendMail';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
 import { AuthModel } from './entities/auth.entity';
 import { getProfile } from './helper/profile';
@@ -29,7 +31,6 @@ export class AuthService {
       email,
       password: hashPassword,
       salt,
-      role: 'user',
     });
     const existingUser = await this.findUserByEmail(email);
     if (existingUser.length > 0) {
@@ -37,6 +38,7 @@ export class AuthService {
     }
     const result = await newUser.save();
     const profile = getProfile(result);
+    await sendEmail(profile, await confirmEmailLink(profile.id));
     const accessToken = await this.jwtService.sign(profile);
     return { profile, accessToken };
   }
@@ -60,6 +62,14 @@ export class AuthService {
       message: 'User Login Successfully!',
       profile,
       accessToken,
+    };
+  }
+
+  async confirmEmailLink(id: string) {
+    await this.authModel.updateOne({ _id: id }, { $set: { active: true } });
+    return {
+      message: 'Make Your Account Confirm successfully!',
+      active: true,
     };
   }
 

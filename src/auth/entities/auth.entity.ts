@@ -6,7 +6,8 @@ export const authSchema = new mongoose.Schema({
   email: { type: 'string', required: true },
   password: { type: 'string', required: true },
   salt: { type: 'string', required: true },
-  role: { type: 'string', required: true },
+  role: { type: 'string', required: true, default: 'user' },
+  active: { type: 'boolean', default: false },
 });
 
 export interface AuthModel extends mongoose.Document {
@@ -16,4 +17,5 @@ export interface AuthModel extends mongoose.Document {
   password: string;
   salt: string;
   role: string;
+  active: boolean;
 }

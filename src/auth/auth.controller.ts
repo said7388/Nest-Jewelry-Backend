@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -10,6 +11,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { redis } from 'src/redis';
 import { AuthService } from './auth.service';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
 
@@ -41,5 +43,15 @@ export class AuthController {
       return this.authService.makeUserToAdmin(body.email);
     }
     throw new UnauthorizedException('You have no permission to make admin.');
+  }
+
+  @Get('/confirm/:id')
+  async confirm(@Param('id') id: string) {
+    const userId = await redis.get(`confirmEmail:${id}`);
+    if (!userId) {
+      throw new NotFoundException('Your Varification Token is Expired.');
+    }
+
+    return this.authService.confirmEmailLink(userId);
   }
 }
