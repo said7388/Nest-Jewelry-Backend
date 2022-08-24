@@ -50,6 +50,26 @@ export class OrdersService {
     return order;
   }
 
+  async findAllOrder() {
+    const orders = await this.orderModel.find().exec();
+    return orders;
+  }
+
+  async updateOrderStatus(id: string) {
+    const result = await this.orderModel.updateOne(
+      { _id: id },
+      { $set: { status: 'accept' } },
+    );
+
+    if (!result.matchedCount) {
+      throw new NotFoundException('Can not find the order!');
+    }
+
+    return {
+      message: 'Accept this order successfully!',
+    };
+  }
+
   async remove(id: string, email: string) {
     const result = await this.orderModel
       .findOneAndRemove({ _id: id, email: email })

@@ -8,6 +8,7 @@ export const orderSchema = new mongoose.Schema({
   price: { type: 'number', required: true },
   image: { type: 'string', required: true },
   rating: { type: 'number' },
+  status: { type: 'string', default: 'pending' },
 });
 
 export interface OrderModel extends mongoose.Document {
@@ -18,4 +19,5 @@ export interface OrderModel extends mongoose.Document {
   price: number;
   image: string;
   rating: number;
+  status: string;
 }

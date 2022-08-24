@@ -4,7 +4,9 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
@@ -24,6 +26,14 @@ export class OrdersController {
     return this.ordersService.create(createOrderDto, user);
   }
 
+  @Get('all')
+  getAllOrders(@GetUser() user) {
+    if (user?.role !== 'admin') {
+      throw new UnauthorizedException('You have not access to get all orders!');
+    }
+    return this.ordersService.findAllOrder();
+  }
+
   @Get()
   findAll(@GetUser() user) {
     return this.ordersService.findOrderByEmail(user.email);
@@ -32,6 +42,17 @@ export class OrdersController {
   @Get(':id')
   findOne(@Param('id') id: string, @GetUser() user) {
     return this.ordersService.findOne(id, user?.email);
+  }
+
+  @Patch(':id')
+  updateOrderStatus(@Param('id') id: string, @GetUser() user) {
+    if (user?.role !== 'admin') {
+      throw new UnauthorizedException(
+        'You have not access to update order status!',
+      );
+    }
+
+    return this.ordersService.updateOrderStatus(id);
   }
 
   @Delete(':id')
