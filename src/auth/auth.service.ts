@@ -22,12 +22,11 @@ export class AuthService {
   ) {}
 
   async createNewUser(createAuthDto: CreateAuthDto) {
-    const { firstName, lastName, email, password } = createAuthDto;
+    const { fullName, email, password } = createAuthDto;
     const salt = await bycript.genSalt();
     const hashPassword = await bycript.hash(password, salt);
     const newUser = new this.authModel({
-      firstName,
-      lastName,
+      fullName,
       email,
       password: hashPassword,
       salt,
