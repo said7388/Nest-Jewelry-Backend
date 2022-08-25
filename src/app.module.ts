@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 dotenv.config();
 
 const configUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.ha2x2.mongodb.net/jewelry_niche?retryWrites=true&w=majority`;
@@ -18,6 +19,7 @@ const configUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWOR
     AuthModule,
     ProductsModule,
     OrdersModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],

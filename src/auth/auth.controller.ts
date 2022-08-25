@@ -8,9 +8,12 @@ import {
   Post,
   Req,
   UnauthorizedException,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { redis } from 'src/redis';
 import { AuthService } from './auth.service';
@@ -69,5 +72,11 @@ export class AuthController {
   async phoneVerify(@Body() phone: PhoneNumberDto) {
     const { number } = phone;
     return this.authService.sendSms(number);
+  }
+
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadImage(@UploadedFile() file: Express.Multer.File) {
+    return this.authService.uploadImageToCloudinary(file);
   }
 }

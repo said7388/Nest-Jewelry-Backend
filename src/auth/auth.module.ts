@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PassportModule } from '@nestjs/passport';
 import { TwilioModule } from 'nestjs-twilio';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { authSchema } from './entities/auth.entity';
@@ -22,6 +23,7 @@ import { JwtStrategy } from './jwt.strategy';
       accountSid: process.env.TWILIO_ACCOUNT_SID,
       authToken: process.env.TWILIO_AUTH_TOKEN,
     }),
+    CloudinaryModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

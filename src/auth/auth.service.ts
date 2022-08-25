@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import * as bycript from 'bcryptjs';
 import { Model } from 'mongoose';
 import { TwilioService } from 'nestjs-twilio';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { confirmEmailLink } from 'src/utils/confirmEmailLink';
 import { sendEmail } from 'src/utils/sendMail';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
@@ -21,6 +22,7 @@ export class AuthService {
     @InjectModel('users') private readonly authModel: Model<AuthModel>,
     private readonly jwtService: JwtService,
     private readonly twilioService: TwilioService,
+    private cloudinary: CloudinaryService,
   ) {}
 
   // create new user account function
@@ -124,5 +126,22 @@ export class AuthService {
   async findUserByEmail(email: string) {
     const result = await this.authModel.find({ email: email }).exec();
     return result;
+  }
+
+  async uploadImageToCloudinary(file: Express.Multer.File) {
+    const result = await this.cloudinary
+      .uploadImage(file, 'profile')
+      .catch(() => {
+        throw new BadRequestException('Invalid file type.');
+      });
+
+    const photo = {
+      url: result.url,
+      secureUrl: result.secure_url,
+      format: result.format,
+      width: result.width,
+      height: result.height,
+    };
+    return photo;
   }
 }
