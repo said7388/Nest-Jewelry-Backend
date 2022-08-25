@@ -20,7 +20,7 @@ export const sendEmail = async (user, link: string) => {
     subject: 'Welcome to Jewelry! Confirm Your Email', // Subject line
     text: 'Confirm your account', // plain text body
     html: `
-    <b>Hello ${user.firstName + ' ' + user.lastName}!</b><br />
+    <b>Hello ${user.fullName}!</b><br />
     <h5>
     You're on your way! <br />
     Let's confirm your email address.</h5>

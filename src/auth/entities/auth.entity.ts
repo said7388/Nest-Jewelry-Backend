@@ -1,5 +1,6 @@
 import * as mongoose from 'mongoose';
 
+// User data collection schema
 export const authSchema = new mongoose.Schema({
   fullName: { type: 'string', required: true },
   email: { type: 'string', required: true },

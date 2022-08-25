@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bycript from 'bcryptjs';
 import { Model } from 'mongoose';
+import { TwilioService } from 'nestjs-twilio';
 import { confirmEmailLink } from 'src/utils/confirmEmailLink';
 import { sendEmail } from 'src/utils/sendMail';
 import { CreateAuthDto, LoginAuthDto } from './dto/auth-model.dto';
@@ -19,8 +20,10 @@ export class AuthService {
   constructor(
     @InjectModel('users') private readonly authModel: Model<AuthModel>,
     private readonly jwtService: JwtService,
+    private readonly twilioService: TwilioService,
   ) {}
 
+  // create new user account function
   async createNewUser(createAuthDto: CreateAuthDto) {
     const { fullName, email, password } = createAuthDto;
     const salt = await bycript.genSalt();
@@ -42,6 +45,7 @@ export class AuthService {
     return { profile, accessToken };
   }
 
+  // user login function
   async loginUser(loginAuthDto: LoginAuthDto) {
     const { email, password } = loginAuthDto;
     const existingUser = await this.findUserByEmail(email);
@@ -52,10 +56,18 @@ export class AuthService {
     const salt = user.salt;
     const hashPassword = await bycript.hash(password, salt);
     const db_password = user.password;
+    const profile = getProfile(user);
+
     if (!(hashPassword === db_password)) {
       throw new BadRequestException('Password does not match!');
+    } else if (!user.active) {
+      await sendEmail(profile, await confirmEmailLink(profile.id));
+      throw new BadRequestException({
+        message: 'Please check your mail and confirm your email address!',
+        active: false,
+      });
     }
-    const profile = getProfile(user);
+    // genarate JWT token
     const accessToken = await this.jwtService.sign(profile);
     return {
       message: 'User Login Successfully!',
@@ -64,6 +76,7 @@ export class AuthService {
     };
   }
 
+  // Confirm user account by email
   async confirmEmailLink(id: string) {
     await this.authModel.updateOne({ _id: id }, { $set: { active: true } });
     return {
@@ -72,6 +85,22 @@ export class AuthService {
     };
   }
 
+  // send sms verification code to user
+  async sendSms(phone: string) {
+    const code = Math.floor(100000 + Math.random() * 900000);
+
+    const result = await this.twilioService.client.messages.create({
+      body: `Your Jewelry Verification code: ${code}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phone,
+    });
+
+    if (result) {
+      return { message: 'Verification code sent successfully!' };
+    }
+  }
+
+  // make a user as an administrator by another admin
   async makeUserToAdmin(email: string) {
     const result = await this.authModel.updateOne(
       { email: email },

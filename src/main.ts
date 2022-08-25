@@ -9,6 +9,7 @@ async function bootstrap() {
   app.use(cors());
   app.useGlobalPipes(new ValidationPipe());
 
+  // OpenAPI swagger configuration
   const options = new DocumentBuilder()
     .setTitle('Jewelry')
     .setDescription('Jewelry Backend Documentation!')

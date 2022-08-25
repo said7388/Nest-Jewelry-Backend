@@ -14,7 +14,7 @@ const configUrl = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWOR
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    MongooseModule.forRoot(configUrl),
+    MongooseModule.forRoot(configUrl), // Database configuration
     AuthModule,
     ProductsModule,
     OrdersModule,

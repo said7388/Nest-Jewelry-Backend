@@ -1,11 +1,13 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsPhoneNumber,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
 
+// User SignUP data model
 export class CreateAuthDto {
   @IsString()
   @IsNotEmpty()
@@ -23,6 +25,7 @@ export class CreateAuthDto {
   password: string;
 }
 
+// User Login data model
 export class LoginAuthDto {
   @IsEmail()
   email: string;
@@ -30,4 +33,11 @@ export class LoginAuthDto {
   @IsString()
   @MinLength(8)
   password: string;
+}
+
+// Validation Phone number
+export class PhoneNumberDto {
+  @IsPhoneNumber()
+  @IsString({ message: 'must be a valid number' })
+  number: string;
 }
