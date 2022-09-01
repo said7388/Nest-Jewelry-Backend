@@ -41,10 +41,11 @@ export class AuthService {
       throw new ConflictException('This email alrady taken!');
     }
     const result = await newUser.save();
-    const profile = getProfile(result);
-    await sendEmail(profile, await confirmEmailLink(profile.id));
-    const accessToken = await this.jwtService.sign(profile);
-    return { profile, accessToken };
+    if (result) {
+      return {
+        message: 'User created Successfully!',
+      };
+    }
   }
 
   // user login function
